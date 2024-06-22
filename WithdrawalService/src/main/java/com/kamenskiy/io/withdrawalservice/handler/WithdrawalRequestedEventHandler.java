@@ -6,8 +6,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Component;
 
-@KafkaListener
+@Component
+@KafkaListener(topics = "withdraw-event-topic", containerFactory = "kafkaListenerContainerFactory")
 public class WithdrawalRequestedEventHandler {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
