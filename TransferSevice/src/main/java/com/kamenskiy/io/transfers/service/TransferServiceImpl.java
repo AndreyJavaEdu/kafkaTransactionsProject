@@ -1,5 +1,7 @@
 package com.kamenskiy.io.transfers.service;
 
+import com.kamenskiy.io.core.events.DepositRequestedEvent;
+import com.kamenskiy.io.core.events.WithdrawalRequestedEvent;
 import com.kamenskiy.io.transfers.model.TransferRestModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +52,7 @@ public class TransferServiceImpl implements TransferService {
     }
 
     private ResponseEntity<String> callRemoteService() throws Exception {
-        String requestUrl;
+        String requestUrl = " http://localhost/response/200";
         ResponseEntity<String> response = restTemplate.exchange(requestUrl, HttpMethod.GET, null, String.class);
 
         if (response.getStatusCode().value() == HttpStatus.SERVICE_UNAVAILABLE.value()) {
@@ -59,5 +61,6 @@ public class TransferServiceImpl implements TransferService {
         if (response.getStatusCode().value() == HttpStatus.OK.value()) {
             LOGGER.info("Destination Microservice is available and received response from mock service");
         }
+        return response;
     }
 }
