@@ -8,3 +8,4 @@ spring:
       group-id: amount-withdrawal-event
       properties:
         spring.json.trusted.packages: com.kamenskiy.io.core.events
+      isolation-level: read_committed

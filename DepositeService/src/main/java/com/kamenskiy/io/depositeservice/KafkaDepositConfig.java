@@ -35,7 +35,7 @@ public class KafkaDepositConfig {
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, environment.getProperty("spring.kafka.consumer.group-id"));
         props.put(JsonDeserializer.TRUSTED_PACKAGES,
-                environment.getProperty("spring.kafka.consumer.trusted-packages"));
+                environment.getProperty("spring.kafka.consumer.properties.spring.json.trusted.packages"));
         return new DefaultKafkaConsumerFactory<>(props);
     }
 

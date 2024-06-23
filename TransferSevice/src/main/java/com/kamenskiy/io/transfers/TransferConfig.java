@@ -9,6 +9,8 @@ import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.transaction.KafkaTransactionManager;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,16 +39,19 @@ public class TransferConfig {
     private String requestTimeout;
 
     @Value("${spring.kafka.producer.properties.max.inflight.requests.per.connection}")
-    private String maxInflightRequests;
+    private int maxInflightRequests;
 
     @Value("${spring.kafka.producer.properties.enable.idempotence}")
-    private String idempotence;
+    private boolean idempotence;
 
     @Value("withdraw-money-topic")
     private String withdrawTopicName;
 
     @Value("deposit-money-topic")
     private String depositTopicName;
+
+    @Value("${spring.kafka.producer.transaction-id-prefix}")
+    private String transactionIdPrefix;
 
     public Map<String, Object> producerConfigs() {
         Map<String, Object> props = new HashMap<>();
@@ -59,18 +64,29 @@ public class TransferConfig {
         props.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, requestTimeout);
         props.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, maxInflightRequests);
         props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, idempotence);
+        props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, transactionIdPrefix);
         return props;
     }
 
     @Bean
-    public ProducerFactory<String, Object> producerFactory(Map<String, Object> producerConfigs) {
-        return new DefaultKafkaProducerFactory<>(producerConfigs);
+    public ProducerFactory<String, Object> producerFactory() {
+        return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
     @Bean
     KafkaTemplate<String, Object> kafkaTemplate(ProducerFactory<String, Object> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
+
+    @Bean
+    KafkaTransactionManager<String, Object> kafkaTransactionManager(ProducerFactory<String, Object> producerFactory) {
+        return new KafkaTransactionManager<>(producerFactory);
+    }
+
+//    @Bean
+//    RestTemplate getRestTemplate() {
+//        return new RestTemplate();
+//    }
 
     @Bean
     NewTopic createWithdrawTopic() {
@@ -81,6 +97,4 @@ public class TransferConfig {
     NewTopic createDepositTopic() {
         return TopicBuilder.name(depositTopicName).partitions(3).replicas(3).build();
     }
-
-
 }

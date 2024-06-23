@@ -1,7 +1,10 @@
 package com.kamenskiy.io.transfers.service;
 
+
 import com.kamenskiy.io.core.events.DepositRequestedEvent;
 import com.kamenskiy.io.core.events.WithdrawalRequestedEvent;
+
+import com.kamenskiy.io.transfers.error.TransferServiceException;
 import com.kamenskiy.io.transfers.model.TransferRestModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,14 +14,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 @Service
+@Transactional(value = "kafkaTransactionManager")
 public class TransferServiceImpl implements TransferService {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+
     private KafkaTemplate<String, Object> kafkaTemplate;
     private Environment environment;
-    private RestTemplate restTemplate;
+    private  RestTemplate restTemplate;
 
     public TransferServiceImpl(KafkaTemplate<String, Object> kafkaTemplate, Environment environment, RestTemplate restTemplate) {
         this.kafkaTemplate = kafkaTemplate;
@@ -45,9 +51,8 @@ public class TransferServiceImpl implements TransferService {
                     depositEvent);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            throw new RuntimeException(e);
+            throw new TransferServiceException(e);
         }
-
         return true;
     }
 

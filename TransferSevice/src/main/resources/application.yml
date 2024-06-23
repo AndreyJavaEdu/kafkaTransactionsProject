@@ -14,6 +14,10 @@ spring:
         request.timeout.ms: 30000
         max.inflight.requests.per.connection: 5
         enable.idempotence: true
-
+      transaction-id-prefix: transfer-service-${random.value}-
 withdraw-money-topic: withdraw-money-topic
 deposit-money-topic: deposit-money-topic
+logging:
+  level:
+    org.springframework.kafka.transaction: TRACE
+    org.springframework.transaction: TRACE
