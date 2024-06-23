@@ -11,11 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/transfers")
-public class TransferController {
+public class TransfersController {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+
     private TransferService transferService;
 
-    public TransferController(TransferService transferService) {
+    public TransfersController(TransferService transferService) {
         this.transferService = transferService;
     }
 

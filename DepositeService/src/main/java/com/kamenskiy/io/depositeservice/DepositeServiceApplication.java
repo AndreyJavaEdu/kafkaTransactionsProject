@@ -1,13 +1,13 @@
-package com.kamenskiy.io.core;
+package com.kamenskiy.io.depositeservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CoreApplication {
+public class DepositeServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CoreApplication.class, args);
+        SpringApplication.run(DepositeServiceApplication.class, args);
     }
 
 }

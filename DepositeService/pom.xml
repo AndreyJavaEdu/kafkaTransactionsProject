@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.kamenskiy.io</groupId>
-    <artifactId>TransferSevice</artifactId>
+    <artifactId>DepositeService</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>TransferSevice</name>
-    <description>TransferSevice</description>
+    <name>DepositeService</name>
+    <description>DepositeService</description>
     <url/>
     <licenses>
         <license/>
@@ -64,4 +64,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

@@ -1,4 +1,4 @@
-package com.kamenskiy.io.withdrawalservice;
+package com.kamenskiy.io.depositeservice;
 
 import com.kamenskiy.io.core.error.NotRetryableException;
 import com.kamenskiy.io.core.error.RetryableException;
@@ -22,8 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class KafkaConsumerConfig {
-
+public class KafkaDepositConfig {
     @Autowired
     Environment environment;
 
@@ -37,21 +36,18 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, environment.getProperty("spring.kafka.consumer.group-id"));
         props.put(JsonDeserializer.TRUSTED_PACKAGES,
                 environment.getProperty("spring.kafka.consumer.properties.spring.json.trusted.packages"));
-        props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG,
-                environment.getProperty("spring.kafka.consumer.isolation-level", "READ_COMMITED").toLowerCase());
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
-    ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(
-            ConsumerFactory<String, Object> consumerFactory, KafkaTemplate<String, Object> kafkaTemplate) {
+    ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(ConsumerFactory<String, Object> consumerFactory,
+                                                                                          KafkaTemplate<String, Object> kafkaTemplate) {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
-
         DefaultErrorHandler errorHandler = new DefaultErrorHandler(new DeadLetterPublishingRecoverer(kafkaTemplate),
                 new FixedBackOff(5000, 3));
         errorHandler.addNotRetryableExceptions(NotRetryableException.class);
-        errorHandler.addNotRetryableExceptions(RetryableException.class);
+        errorHandler.addRetryableExceptions(RetryableException.class);
         factory.setCommonErrorHandler(errorHandler);
         return factory;
     }
@@ -63,12 +59,10 @@ public class KafkaConsumerConfig {
 
     @Bean
     ProducerFactory<String, Object> producerFactory() {
-        Map<String, Object> config = new HashMap<>();
-        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                environment.getProperty("spring.kafka.bootstrap-servers"));
-        config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        return new DefaultKafkaProducerFactory<>(config);
+        Map<String, Object> props = new HashMap<>();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, environment.getProperty("spring.kafka.bootstrap-servers"));
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        return new DefaultKafkaProducerFactory<>(props);
     }
-
 }
