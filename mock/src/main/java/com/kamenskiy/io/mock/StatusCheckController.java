@@ -2,9 +2,11 @@ package com.kamenskiy.io.mock;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/response")
+@RestController
+@RequestMapping("/response")
 public class StatusCheckController {
 
     @GetMapping("/200")
