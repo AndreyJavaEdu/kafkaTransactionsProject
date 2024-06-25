@@ -9,7 +9,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 @Component
-@KafkaListener(topics = "withdraw-event-topic", containerFactory = "kafkaListenerContainerFactory")
+@KafkaListener(topics = "withdraw-money-topic", containerFactory = "kafkaListenerContainerFactory")
 public class WithdrawalRequestedEventHandler {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 

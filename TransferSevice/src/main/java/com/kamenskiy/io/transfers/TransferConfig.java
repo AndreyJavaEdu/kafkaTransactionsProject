@@ -83,11 +83,6 @@ public class TransferConfig {
         return new KafkaTransactionManager<>(producerFactory);
     }
 
-//    @Bean
-//    RestTemplate getRestTemplate() {
-//        return new RestTemplate();
-//    }
-
     @Bean
     NewTopic createWithdrawTopic() {
         return TopicBuilder.name(withdrawTopicName).partitions(3).replicas(3).build();

@@ -24,7 +24,7 @@ public class TransferServiceImpl implements TransferService {
 
     private KafkaTemplate<String, Object> kafkaTemplate;
     private Environment environment;
-    private  RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 
     public TransferServiceImpl(KafkaTemplate<String, Object> kafkaTemplate, Environment environment, RestTemplate restTemplate) {
         this.kafkaTemplate = kafkaTemplate;
@@ -32,7 +32,7 @@ public class TransferServiceImpl implements TransferService {
         this.restTemplate = restTemplate;
     }
 
-    @Override
+   /* @Override
     public boolean transfer(TransferRestModel transferRestModel) {
         WithdrawalRequestedEvent withdrawalEvent = new WithdrawalRequestedEvent(transferRestModel.getSenderId(),
                 transferRestModel.getRecepientId(), transferRestModel.getAmount());
@@ -49,6 +49,32 @@ public class TransferServiceImpl implements TransferService {
 
             kafkaTemplate.send(environment.getProperty("deposit-money-topic", "deposit-money-topic"),
                     depositEvent);
+            LOGGER.info("Sending deposit event to deposit topic");
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new TransferServiceException(e);
+        }
+        return true;
+    }
+    */
+
+    public boolean transfer(TransferRestModel transferRestModel) {
+        WithdrawalRequestedEvent withdrawalEvent = new WithdrawalRequestedEvent(transferRestModel.getSenderId(),
+                transferRestModel.getRecepientId(), transferRestModel.getAmount());
+        DepositRequestedEvent depositEvent = new DepositRequestedEvent(transferRestModel.getSenderId(),
+                transferRestModel.getRecepientId(), transferRestModel.getAmount());
+
+        try {
+            Boolean result = kafkaTemplate.executeInTransaction(t -> {
+                t.send(environment.getProperty("withdraw-money-topic", "withdraw-money-topic"),
+                        withdrawalEvent);
+                LOGGER.info("Sending withdrawal event to withdrawal topic");
+                t.send(environment.getProperty("deposit-money-topic", "deposit-money-topic"),
+                        depositEvent);
+                LOGGER.info("Sending deposit event to deposit topic");
+                return true;
+            });
+            callRemoteService();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             throw new TransferServiceException(e);
@@ -57,7 +83,7 @@ public class TransferServiceImpl implements TransferService {
     }
 
     private ResponseEntity<String> callRemoteService() throws Exception {
-        String requestUrl = " http://localhost:8082/response/200";
+        String requestUrl = "http://localhost:8082/response/200";
         ResponseEntity<String> response = restTemplate.exchange(requestUrl, HttpMethod.GET, null, String.class);
 
         if (response.getStatusCode().value() == HttpStatus.SERVICE_UNAVAILABLE.value()) {
