@@ -15,9 +15,23 @@ spring:
         max.inflight.requests.per.connection: 5
         enable.idempotence: true
       transaction-id-prefix: transfer-service-${random.value}-
+
+  datasource:
+    username: test
+    password: test
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+
 withdraw-money-topic: withdraw-money-topic
 deposit-money-topic: deposit-money-topic
 logging:
   level:
-    org.springframework.kafka.transaction: TRACE
-    org.springframework.transaction: TRACE
+    org.springframework.kafka.transaction.KafkaAwareTransactionManager: debug
+    org.springframework.transaction: debug
+    org.springframework.orm.jpa.JpaTransactionManager: debug
+    org.apache.kafka.clients.producer.internals.TransactionManager: debug
